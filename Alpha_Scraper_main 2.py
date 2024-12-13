@@ -22,7 +22,7 @@ def run_script(script_name):
         print(f"Error in {script_name}: {result.stderr}")
 
 def main():
-    scripts = ['Blinkit_V1.py', 'Bigbasket_V1.py',  'SwiggyInsta_V1.py','Zepto_V1.py']
+    scripts = ['Blinkit_V2.py', 'Bigbasket_V2.py',  'SwiggyInsta_V2.py','Zepto_V2.py']
 
     # Use ThreadPoolExecutor to run scripts in parallel
     with concurrent.futures.ThreadPoolExecutor() as executor:
@@ -49,10 +49,10 @@ if __name__ == "__main__":
 # 
 # def main():
 #     # Run each script independently
-#     run_script('Blinkit_V1.py')
-#     run_script('Bigbasket_V1.py')
-#     run_script('Zepto_V1.py')
-#     run_script('SwiggyInsta_V1.py')
+#     run_script('Blinkit_V2.py')
+#     run_script('Bigbasket_V2.py')
+#     run_script('Zepto_V2.py')
+#     run_script('SwiggyInsta_V2.py')
 # 
 # if __name__ == "__main__":
 #     main()
