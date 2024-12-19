@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[4]:
+# In[1]:
 
 
 import pandas as pd
@@ -20,7 +20,7 @@ import numpy as np
 import re
 
 
-# In[ ]:
+# In[2]:
 
 
 
@@ -30,7 +30,7 @@ options = EdgeOptions()
 driver = webdriver.Edge(options=options)
 
 # List of keywords to search
-list_search = [''Dairy','Bread','Eggs','Snacks','Bakery','Biscuits','Tea','Coffee','Atta','Rice','Dal','Masala','Oil','Sauces','Spreads']
+list_search = ['Dairy','Bread','Eggs','Snacks','Bakery','Biscuits','Tea','Coffee','Atta','Rice','Dal','Masala','Oil','Sauces','Spreads']
 Pincode="400709"
 pin = 1
 # Initialize an empty list to store the scraped data
@@ -124,7 +124,7 @@ print(df.head())
 driver.quit()
 
 
-# In[ ]:
+# In[88]:
 
 
 import re
@@ -213,7 +213,7 @@ def classify_content(row):
             row['Imported'] = value
         
         # Check for 'Pack Size' criteria
-        elif any(char.isdigit() for char in value) and any(unit in value.lower() for unit in ['g', 'kg', 'l','pack','unit','units','packs','piece','pieces']):
+        elif any(char.isdigit() for char in value) and any(unit in value.lower() for unit in ['g',' g', 'kg', 'l','pack','unit','units','packs','piece','pieces']):
             # Pack size should be assigned only after Product
             if not product_assigned:
                 row['Product'] = value  # Assign to Product if it's the first content
@@ -248,6 +248,45 @@ df_structured = df_structured.apply(classify_content, axis=1)
 df_structured.loc[df_structured[df_structured['Separator']=='Sold Out'].index,'Stock'] = 'Out of Stock'
 
 
+# In[ ]:
+
+
+df_structured['Actual_Price'] = np.nan
+df_structured['Final_Price'] = np.nan
+
+indx1 =df_structured[(df_structured['Field_9'].notnull()) & (df_structured[f"Field_9"].str.isdigit()) &(df_structured['Field_9'].str.len() >= 2)&(df_structured['Actual_Price'].isna())].index
+df_structured.loc[indx1, "Actual_Price"] = df_structured.loc[indx1, 'Field_9']
+df_structured.loc[indx1, "Final_Price"] = df_structured.loc[indx1, 'Field_8']
+
+
+indx2 =df_structured[(df_structured['Field_8'].notnull()) & (df_structured[f"Field_8"].str.isdigit()) &(df_structured['Field_8'].str.len() >= 2)&(df_structured['Actual_Price'].isna())].index
+df_structured.loc[indx2, "Actual_Price"] = df_structured.loc[indx2, 'Field_8']
+df_structured.loc[indx2, "Final_Price"] = df_structured.loc[indx2, 'Field_7']
+
+indx3 =df_structured[(df_structured['Field_7'].notnull()) & (df_structured[f"Field_7"].str.isdigit()) &(df_structured['Field_7'].str.len() >= 2)&(df_structured['Actual_Price'].isna())].index
+df_structured.loc[indx3, "Actual_Price"] = df_structured.loc[indx3, 'Field_7']
+df_structured.loc[indx3, "Final_Price"] = df_structured.loc[indx3, 'Field_6']
+
+indx4 =df_structured[(df_structured['Field_6'].notnull()) & (df_structured[f"Field_6"].str.isdigit()) &(df_structured['Field_6'].str.len() >= 2)&(df_structured['Final_Price'].isna())].index
+df_structured.loc[indx4, "Final_Price"] = df_structured.loc[indx4, 'Field_6']
+
+indx5 =df_structured[(df_structured['Field_5'].notnull()) & (df_structured[f"Field_5"].str.isdigit()) &(df_structured['Field_5'].str.len() >= 2)&(df_structured['Final_Price'].isna())].index
+df_structured.loc[indx5, "Final_Price"] = df_structured.loc[indx5, 'Field_5']
+
+
+# Define the keywords to check
+keywords = ['g', ' g', 'kg', 'l', 'pack', 'unit', 'units', 'packs', 'piece', 'pieces']
+
+# Create a regex pattern to match any combination of the keywords
+pattern = '|'.join(keywords)
+
+# Check for the keywords in the Final_Price column
+matching_rows = df_structured['Final_Price'].str.contains(pattern, case=False, na=False)
+
+# Copy Actual_Price to Final_Price for matching rows
+df_structured.loc[matching_rows, 'Final_Price'] = df_structured.loc[matching_rows, 'Actual_Price']
+
+
 # In[24]:
 
 
@@ -276,4 +315,10 @@ file_name = f'SwiggyInsta_{current_datetime}.xlsx'
 
 # Save the DataFrame to Excel
 df_structured.to_excel(file_name, index=False)
+
+
+# In[ ]:
+
+
+
 
